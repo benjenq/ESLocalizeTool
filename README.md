@@ -1,6 +1,6 @@
 # EmulationStation Source Code Localized Tool
 
-A powerful tool to localized the ES (EmulationStation) source code. Easy to use and almost support the last ES source code.
+A powerful tool to localized the ES (EmulationStation) source code. Easy to use and  support the lastest ES source code.
 
 ![screenshot of ESLocaleTool](pics/screenshot.png)
 
@@ -87,11 +87,11 @@ You can also run this tool by console mode:
 ```
 python3 ESLocalize_cmd.py
 ```
-It's suitable for your os without Desktop environment.
+It works for your os without desktop environment.
 
 ## Supplemental Instruction
 
-1. If your python version is 3.7.x or less, you will got `Limited functionality` warrning. You can not enable and check `Overwrite source` because old python command `copytree` and `rmtree` is not compatible.
+1. If your python version is 3.7.x or less, you will got `Limited functionality` warrning. You can not enable and check `Overwrite source` because old python command `copytree()` and `rmtree()` is not compatible.
 
 2. You can use `pyinstaller` command to create direct executable file:
 ```
