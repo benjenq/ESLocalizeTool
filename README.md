@@ -1,6 +1,6 @@
 # EmulationStation Source Code Localized Tool
 
-A powerful tool that modify ES (EmulationStation) source code to support localization. Easy to use and support the lastest ES version.
+A powerful tool to localized the ES (EmulationStation) source code. Easy to use and almost support the last ES source code.
 
 ![screenshot of ESLocaleTool](pics/screenshot.png)
 
@@ -53,7 +53,7 @@ git clone https://github.com/benjenq/ESLocalizeTool.git
 
 ```
 cd ESLocalizeTool
-python3 ESLocalize.py
+python3 ESLocalize_ui.py
 ```
 
 ## How to use
@@ -82,13 +82,20 @@ sudo cp ./emulationstation /opt/retropie/supplementary/emulationstation/
 sudo cp -r locale /opt/retropie/supplementary/emulationstation/
 ```
 
+## Console mode (Command line mode)
+You can also run this tool by console mode:
+```
+python3 ESLocalize_cmd.py
+```
+It's suitable for your os without Desktop environment.
+
 ## Supplemental Instruction
 
 1. If your python version is 3.7.x or less, you will got `Limited functionality` warrning. You can not enable and check `Overwrite source` because old python command `copytree` and `rmtree` is not compatible.
 
 2. You can use `pyinstaller` command to create direct executable file:
 ```
-pyinstaller ESLocalied.spec
+pyinstaller ESLocalied_ui.spec
 ```
 or download executable file from [`Release`](https://github.com/benjenq/ESLocalizeTool/releases) tab.
 
