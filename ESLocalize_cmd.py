@@ -7,6 +7,7 @@ pyinstaller --add-data="regexlist.db:." --add-data="LocalizeFiles:LocalizeFiles"
 from RegExHelp import *
 from os import *
 from math import floor
+import re
 
 dealFiles = []
 
@@ -22,6 +23,8 @@ class getParaFromInput(object):
             try:
                 if(self.projRootPath == ""):
                     self.projRootPath = input("Please enter EmulationStation Source Path : \n").strip()
+                if(re.findall(r"'(.+)'",self.projRootPath,re.M)): # '/xxxx/EmulationStation'
+                    self.projRootPath = re.sub(r"'(.+)'","\\1",self.projRootPath,re.M)
                 if(not path.exists(self.projRootPath) or self.projRootPath == ""):
                     print('Path is invalid. Please reinput correct path')
                     self.projRootPath = ""
@@ -57,7 +60,7 @@ class getParaFromInput(object):
 if __name__ == '__main__':
     para = getParaFromInput()
     if(not para.inputSuccess):
-        print("Process Abort")
+        print("\nProcess Abort\n")
         exit(0)
     for root, dirs, files in walk(para.projRootPath):
         '''for dir in dirs:
