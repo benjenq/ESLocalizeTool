@@ -1,9 +1,0 @@
-<RCC>
-  <qresource prefix="png">
-    <file>resources/icon_warrning.png</file>
-    <file>resources/icon_no.png</file>
-    <file>resources/icon_yes.png</file>
-    <file>resources/es_icon.png</file>
-    <file>resources/es_logo.png</file>
-  </qresource>
-</RCC>
