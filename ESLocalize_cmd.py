@@ -14,12 +14,12 @@ dealFiles = []
 class getParaFromInput(object):
     global dealFiles
     def __init__(self) -> None:
-        loop = True
+        _loop = True
         self.inputSuccess = False
         self.projRootPath = ""
         self.owsc = False
         print("\nThis process need to know something first. Press Ctrl+c to quit anytime.\n")
-        while(loop):
+        while(_loop):
             try:
                 if(self.projRootPath == ""):
                     self.projRootPath = input("Please enter EmulationStation Source Path : \n").strip()
@@ -42,50 +42,54 @@ class getParaFromInput(object):
                     _owsc = "No"
                 print(f'You choose overwrite source code is {_owsc}\n')
 
-                in_scriptType =  input("Script type ? 1 - Linux, 2 - Raspbian OS (Default is Linux): ")
+                in_scriptType =  input("Script type ? 1 - Linux, 2 - Raspbian Pi, 3 - Raspbian Pi 4B  (Default is Linux): ")
                 if(in_scriptType == "" or in_scriptType == ""):
                     self.scriptType = "Linux"
                 elif(int(in_scriptType) == 2):
                     self.scriptType = "Raspberry"
+                elif(int(in_scriptType) == 3):
+                    self.scriptType = "Raspberry4b"
                 else:
                     self.scriptType = "Linux"
                 print(f'You choose script type is {self.scriptType}\n')
                 self.inputSuccess = True
-                loop = False
+                _loop = False
             except KeyboardInterrupt:
                 #print ("\nQuit process.")
                 self.inputSuccess = False
-                loop = False
+                _loop = False
 
 if __name__ == '__main__':
-    para = getParaFromInput()
-    if(not para.inputSuccess):
+    _para = getParaFromInput()
+    if(not _para.inputSuccess):
         print("\nProcess Abort\n")
         exit(0)
-    for root, dirs, files in walk(para.projRootPath):
+    for root, dirs, files in walk(_para.projRootPath):
         '''for dir in dirs:
         print("root={},dir={}".format(root,dir))'''
         for f in files:
             if(root.count(".") <=0 and f[:1] != "."):
                 fullpath = path.join(root, f)
                 dealFiles.append(fullpath)
-    canDo , errStr = RegExHelp.Prepare(p_espath = para.projRootPath, p_owsrc = para.owsc)
-    if(not canDo and errStr != ""):
-        print(f'Error:{errStr}')
+    _canDo , _errStr = RegExHelp.Prepare(p_espath = _para.projRootPath, p_owsrc = _para.owsc)
+    if(not _canDo and _errStr != ""):
+        print(f'Error:{_errStr}')
         exit(0)
-    progress = 0
-    totalProg = len(dealFiles)
+    _progress = 0
+    _totalProg = len(dealFiles)
     for fpath in dealFiles:
-        progress = progress + 1
-        RegExHelp.doSub(fpath,para.projRootPath)
-        print('Process: {}%'.format(floor(100*float(progress/totalProg))))
+        _progress = _progress + 1
+        RegExHelp.doSub(fpath,_para.projRootPath)
+        print('Process: {}%'.format(floor(100*float(_progress/_totalProg))))
     RegExHelp.writeReport()
     print("ES Localization Process Finished!\n")
     cMakeFlag = ""
-    if(para.scriptType == "Linux"):
+    if(_para.scriptType == "Linux"):
         cMakeFlag = "-DUSE_OPENGL_21=On"
-    elif(para.scriptType == "Raspberry"):
+    elif(_para.scriptType == "Raspberry"):
+        cMakeFlag = "-DRPI=On"
+    elif(_para.scriptType == "Raspberry4b"):
         cMakeFlag = "-DRPI=On -DUSE_MESA_GLES=On"
-    scriptText = "cd {}\nmkdir build\ncd build\ncmake -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/ {} ..\nmake -j4\n".format(para.projRootPath,cMakeFlag)
+    scriptText = "cd {}\nmkdir build\ncd build\ncmake -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/ {} ..\nmake -j4\n".format(_para.projRootPath,cMakeFlag)
     print("Compile ES code command is:\n")
     print(scriptText)

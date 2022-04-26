@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 '''
+下載 ES Source Code
+git clone --recursive https://github.com/RetroPie/EmulationStation.git
 安裝套件
 sudo apt install python3-dev python3-pyqt5 qttools5-dev-tools pyqt5-dev-tools
 sudo apt install python3-pip
@@ -29,16 +31,18 @@ class mainWin(QtWidgets.QMainWindow,MainWindow.Ui_MainWindow):
         #https://stackoverflow.com/questions/6784084/how-to-pass-arguments-to-functions-by-the-click-of-button-in-pyqt
         self.btnStart.clicked.connect(lambda: self.doRegexSubProcess(self.btnStart))
         self.center()        
-        if(not OSHelp.verCanRun()):
-            self.chk_owsrc.setChecked(False)
-            self.chk_owsrc.setEnabled(False)
-            self.showAlert(1,"Warrning","Notice","Limited functionality.\nPython version was less then 3.8")
+        
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+    
+    def chkPyVer(self):
+        _canRun, verStr = OSHelp.verCanRun()
+        if(not _canRun):
+            self.showAlert(1,"Warrning","Notice","Limited functionality.\nPython version was less then {ver}}".format(ver=verStr))
 
     def openDialogDir(self):
         global dealFiles
@@ -62,9 +66,9 @@ class mainWin(QtWidgets.QMainWindow,MainWindow.Ui_MainWindow):
     
     def doRegexSubProcess(self,btn:QPushButton):
         btn.setEnabled(False)
-        canDo , errStr = RegExHelp.Prepare(p_espath = self.projRootPath, p_owsrc = self.chk_owsrc.isChecked())
-        if(not canDo):
-            self.showAlert(-1, "Error", "Error!", errStr = errStr)
+        _canDo , _errStr = RegExHelp.Prepare(p_espath = self.projRootPath, p_owsrc = self.chk_owsrc.isChecked())
+        if(not _canDo and _errStr != ""):
+            self.showAlert(-1, "Error", "Error!", errStr = _errStr)
             btn.setEnabled(True)
             return
         progress = 0
@@ -102,9 +106,6 @@ class mainWin(QtWidgets.QMainWindow,MainWindow.Ui_MainWindow):
         dlg.exec_()
         dlg.destroy()
         pass
-
-    def showWarrning(self, errStr:str):
-        pass
         
     def closeEvent(self, evnt):
         pass
@@ -120,6 +121,7 @@ class DialogSuccess(QtWidgets.QDialog, DlgSuccess.Ui_Dialog):
         self.btnCopy.clicked.connect(self.actCopy)
         self.radio_linux.toggled.connect(self.optChanged)
         self.radio_rpi.toggled.connect(self.optChanged)
+        self.radio_rpi4.toggled.connect(self.optChanged)
         self.optChanged()
 
     def optChanged(self):
@@ -127,6 +129,8 @@ class DialogSuccess(QtWidgets.QDialog, DlgSuccess.Ui_Dialog):
         if(self.radio_linux.isChecked()):
             cMakeFlag = "-DUSE_OPENGL_21=On"
         elif(self.radio_rpi.isChecked()):
+            cMakeFlag = "-DRPI=On"
+        elif(self.radio_rpi4.isChecked()):
             cMakeFlag = "-DRPI=On -DUSE_MESA_GLES=On"
         scriptText = "cd {}\nmkdir build\ncd build\ncmake -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/ {} ..\nmake -j4\n".format(self.projRootPath,cMakeFlag)
         self.tb_script_linux.setPlainText(scriptText)
@@ -159,4 +163,5 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mainWin = mainWin()
     mainWin.show()
+    mainWin.chkPyVer()
     sys.exit(app.exec_())

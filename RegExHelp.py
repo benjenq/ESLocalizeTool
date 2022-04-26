@@ -1,24 +1,24 @@
 import re
 import os
 import sys
-from os import path
+from os import path, walk
 import sqlite3
 #import pandas as pd
-from shutil import copytree,rmtree
+from shutil import copyfile # copy2, copytree, rmtree,
 # from distutils.dir_util import remove_tree , copy_tree 有 BUG
 
-allRegexs = None
-esProjPath = ""
-reportLogs = None
-isOverWriteSource = False #是否複寫原始碼
+g_allRegexs = None
+g_esProjPath = ""
+g_reportLogs = None
+g_isOverWriteSource = False #是否複寫原始碼
 
 class OSHelp(object):
     @classmethod
     def verCanRun(cls):
         verNum = 10000*(sys.version_info[0]) + 100 * (sys.version_info[1]) + sys.version_info[2]
-        if(verNum < 30800):
-            return False
-        return True
+        if(verNum < 30600):
+            return False,"3.6"
+        return True,"3.6"
 
     @classmethod
     def bundlePath(cls):
@@ -45,26 +45,18 @@ class OSHelp(object):
         return path.join(OSHelp.bundlePath(), "LocalizeFiles")
 
     @classmethod
-    def outputPath(cls,doCreate:bool = True):
+    def outputPath(cls):
         '''
         程式結果輸出目錄
         '''
-        global esProjPath
-        if(esProjPath == ""):
-            esProjPath = OSHelp.launchPath()
-        if(isOverWriteSource):
-            outputDirName = esProjPath
-            return outputDirName
-        outputDirName = path.join(path.dirname(esProjPath),"output")
-        if( not path.exists(outputDirName)):
-            if(doCreate):
-                try:
-                    os.makedirs(outputDirName)
-                except Exception as inst:
-                    print("Error: type= {}".format(str(type(inst))))
-                    print(inst.args)
-                    print(inst) 
-        return outputDirName
+        global g_esProjPath
+        if(g_esProjPath == ""):
+            g_esProjPath = OSHelp.launchPath()
+        if(g_isOverWriteSource):
+            _outputPath = g_esProjPath #輸出到 EmulationStation 目錄
+        else:
+            _outputPath = path.join(path.dirname(g_esProjPath),"output") #輸出到 Output 目錄
+        return _outputPath
 
     @classmethod
     def reportFile(cls):
@@ -106,7 +98,44 @@ class DBHelp(object):
         #print(allregs.to_dict(orient='records'))
         return resc.to_dict(orient='records') , ""
     '''
+
 class RegExHelp(object):
+    @classmethod
+    def copyLocalizeFiles(cls):
+        _bundlePath = OSHelp.LocalizeFilesPath()
+        _localizefiles = []
+        _localizeDirs = []
+        for root, dirs, files in walk(_bundlePath):
+            for d in dirs:
+                if(root.count(".") <=0 and d[:1] != "."):
+                    fullpath = path.join(root, d)
+                    _localizeDirs.append(fullpath)
+        for root, dirs, files in walk(_bundlePath):
+            for f in files:
+                if(root.count(".") <=0 and f[:1] != "."):
+                    fullpath = path.join(root, f)
+                    _localizefiles.append(fullpath)
+        
+        _outputPath = OSHelp.outputPath()
+        _successful = True
+        _errorString = ""
+        try:
+            for d in _localizeDirs:
+                dstDir = d.replace(_bundlePath,_outputPath)
+                os.makedirs(dstDir,exist_ok=True)
+        
+            for f in _localizefiles:
+                dstFile = f.replace(_bundlePath,_outputPath)
+                if os.path.exists(dstFile):
+                    os.remove(dstFile)
+                copyfile(path.join(_bundlePath,f),dstFile)
+        except Exception as e:
+            print("Error: type= {}".format(str(type(e))))
+            print(e.args)
+            print(e)
+            _successful = False
+            _errorString = str(e)
+        return _successful, _errorString
 
     @classmethod
     def Prepare(cls, p_espath, p_owsrc:bool = False, p_tablebName:str = "es_regex"):
@@ -118,44 +147,26 @@ class RegExHelp(object):
         p_tablebName : 資料表名稱
         
         '''
-        global allRegexs ,esProjPath, reportLogs, isOverWriteSource
-        isOverWriteSource = p_owsrc
-        successful = True
-        errorString = ""        
-        if(p_espath == ""):
-            successful = False
-            return successful, "No ES project path assign."
-        esProjPath = p_espath
+        global g_allRegexs ,g_esProjPath, g_reportLogs, g_isOverWriteSource
+        # 參數設定與檢查
+        if(p_espath == "" or p_espath == None):
+             return False, "No ES project path assign."
+        g_isOverWriteSource = p_owsrc
+        g_esProjPath = p_espath
 
-        if(reportLogs == None):
-            reportLogs = []
+        _success, _errStr = RegExHelp.copyLocalizeFiles()
+        if( not _success):
+            return _success, _errStr
+        if(g_allRegexs == None):
+            g_allRegexs , _errStr = DBHelp.allRegexs(p_tablebName)
+        if( not g_allRegexs and _errStr != ""):
+            return _success, _errStr
+
+        if(g_reportLogs == None):
+            g_reportLogs = []
         else:
-            reportLogs.clear()            
-
-        if(allRegexs == None):
-            allRegexs , errorString = DBHelp.allRegexs(p_tablebName)
-        if( errorString != ""):
-            successful = False
-            return successful, errorString
-
-        outputPath = OSHelp.outputPath(False)
-        
-        if(path.exists(outputPath)):
-            if( not isOverWriteSource):
-                rmtree(outputPath,ignore_errors = True)
-        try:
-            if(OSHelp.verCanRun()):
-                copytree(src=OSHelp.LocalizeFilesPath(),dst=outputPath,dirs_exist_ok = True)
-            else:
-                copytree(src=OSHelp.LocalizeFilesPath(),dst=outputPath)
-        except Exception as inst:
-            print("Error: type= {}".format(str(type(inst))))
-            print(inst.args)
-            print(inst) 
-            successful = False
-            errorString = str(inst)
-        return successful , errorString
-
+            g_reportLogs.clear()     
+        return True,""
 
     @classmethod
     def doSub(cls, filePath:str, rootPath:str, tbName:str = "es_regex"):
@@ -165,11 +176,11 @@ class RegExHelp(object):
         filePath : 原始檔案路徑
         rootPath : 專案路徑
         '''
-        global allRegexs
+        global g_allRegexs
         filename = os.path.basename(filePath)
         errorString = None
-        if(allRegexs == None):
-            allRegexs, errorString = DBHelp.allRegexs(tbName)
+        if(g_allRegexs == None):
+            g_allRegexs, errorString = DBHelp.allRegexs(tbName)
         try:
             f = open(filePath,'r')
             sourceCode = f.read()
@@ -177,11 +188,13 @@ class RegExHelp(object):
         except UnicodeDecodeError:
             print("UnicodeDecodeError Error: {}".format(filePath))
             return
-        except:
-            print("Other open error: {}".format(filePath))
+        except Exception as e:
+            print("Error({}) {}".format(str(e),filePath))
             return
+        except:
+            print("Other open error")
         isMatch = False
-        for reg in allRegexs:
+        for reg in g_allRegexs:
             if(reg["active"] != "Y"):
                 continue
             ext = "({})".format(reg["ext"].replace("*.",".*."))
@@ -215,32 +228,32 @@ class RegExHelp(object):
         '''
         新增 Log 資訊
         '''
-        global reportLogs
+        global g_reportLogs
         if ( not bool(match)):
             return
-        if(reportLogs == None):
-            reportLogs = []
+        if(g_reportLogs == None):
+            g_reportLogs = []
         d:dict = {"ord" : regItem["ord"], "repl" : regItem["repl"], "pattern" : regItem["pattern"], "comment" : regItem["comment"], "filename" : filePath, "match" : len(match)}
-        reportLogs.append(d)
+        g_reportLogs.append(d)
         return
 
     @classmethod
     def writeReport(cls):
-        reportLogs.sort(key = lambda s: s["filename"])
+        g_reportLogs.sort(key = lambda s: s["filename"])
         try:
             f = open(OSHelp.reportFile(),'a+', encoding='utf-8')
             totalMatchCount = 0
-            for log in reportLogs:
+            for log in g_reportLogs:
                 totalMatchCount = totalMatchCount + int(log["match"])
                 oFileName = path.basename(log["filename"])
-                ofPath = path.dirname(log["filename"].replace(esProjPath,""))[1:]
+                ofPath = path.dirname(log["filename"].replace(g_esProjPath,""))[1:]
                 logtext = "{_ord} {_filenm}(found={_match})\t{_fPath}\n".format(_ord=log["ord"], _filenm =oFileName, _fPath =ofPath,  _match = log["match"])
                 f.write(logtext)
             f.write('\nTotal found : {}\n\n'.format(totalMatchCount))
             f.close()
-        except Exception as inst:
-            print("writeReport Error: type= {}".format(str(type(inst))))
-            print(inst.args)
-            print(inst)
+        except Exception as e:
+            print("writeReport Error: type= {}".format(str(type(e))))
+            print(e.args)
+            print(e)
         except:
             print("writeReport Other open error")

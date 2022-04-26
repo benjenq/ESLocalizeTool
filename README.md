@@ -91,15 +91,13 @@ It works for your os without desktop environment.
 
 ## Supplemental Instruction
 
-1. If your python version is 3.7.x or less, you will got `Limited functionality` warrning. You can not enable and check `Overwrite source` because old python command `copytree()` and `rmtree()` is not compatible.
-
-2. You can use `pyinstaller` command to create direct executable file:
+1. You can use `pyinstaller` command to create direct executable file:
 ```
 pyinstaller ESLocalied_ui.spec
 ```
 or download executable file from [`Release`](https://github.com/benjenq/ESLocalizeTool/releases) tab.
 
-3. When localization process finished, A file `reports.txt` created ( located in the ES source directory when check `Overwrite source ?` or under output folder). You could see from `reports.txt` which code of files has been modified.
+2. When localization process finished, A file `reports.txt` created ( located in the ES source directory when check `Overwrite source ?` or under output folder). You could see from `reports.txt` which code of files has been modified.
 
 ## Author
 
