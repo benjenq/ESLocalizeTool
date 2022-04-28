@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import traceback
 from os import path, walk
 import sqlite3
 #import pandas as pd
@@ -182,7 +183,7 @@ class RegExHelp(object):
         if(g_allRegexs == None):
             g_allRegexs, errorString = DBHelp.allRegexs(tbName)
         try:
-            f = open(filePath,'r')
+            f = open(filePath,'r',encoding="utf-8")
             sourceCode = f.read()
             f.close()
         except UnicodeDecodeError:
@@ -191,8 +192,14 @@ class RegExHelp(object):
         except Exception as e:
             print("Error({}) {}".format(str(e),filePath))
             return
+        except BaseException as e:
+            print(filePath)
+            print(repr(e))
+            print(str(traceback.format_exc()))
+            return
         except:
             print("Other open error")
+            return
         isMatch = False
         for reg in g_allRegexs:
             if(reg["active"] != "Y"):
