@@ -77,6 +77,7 @@ class mainWin(QtWidgets.QMainWindow,MainWindow.Ui_MainWindow):
             progress = progress + 1
             RegExHelp.doSub(fpath,self.projRootPath)
             self.regexProgress.setValue(ceil(100*float(progress/totalProg)))
+            QtWidgets.QApplication.processEvents()
         RegExHelp.writeReport()
         btn.setEnabled(True)
         dlg = DialogSuccess(self,p_projPath = self.projRootPath)
