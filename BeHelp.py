@@ -1,6 +1,9 @@
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import *
 import re
-import os
+import os,pathlib
 import sys
+from subprocess import Popen
 import traceback
 from os import path, walk
 import sqlite3
@@ -12,6 +15,19 @@ g_allRegexs = None
 g_esProjPath = ""
 g_reportLogs = None
 g_isOverWriteSource = False #是否複寫原始碼
+
+
+class QtUIHelp(object):
+    @staticmethod
+    def toCenter(ui:QtWidgets.QMainWindow):
+        qr = ui.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        ui.move(qr.topLeft())
+
+    @staticmethod
+    def doFixedSize(ui:QtWidgets.QMainWindow):
+        ui.setFixedSize(ui.frameGeometry().width(),ui.frameGeometry().height())
 
 class OSHelp(object):
     @classmethod
@@ -36,7 +52,35 @@ class OSHelp(object):
             dirPath = path.dirname(sys.argv[0])
         if(sys.argv[0] == ""):
             dirPath = path.dirname(path.abspath(__file__)) #pyinstaller
+        dirPath = path.abspath(path.curdir)
         return dirPath
+    
+    @staticmethod
+    def genPathList(rootPath:str, includeDir:bool = False, extList:list = None, lst:list = None) ->list:
+        '''產生檔案與目錄集
+        ---
+        rootPath: 根目錄
+        includeDir: 輸出是否包含目錄
+        extList: 副檔名 List, 如 ['.JPEG','.CR2'],  ['*'] 為全部
+        lst: <class 'nt.DirEntry'> 物件的 List 集合
+        '''
+        if extList == None:
+            extList = ["*"]
+        if lst == None:
+            lst = []
+        try:
+            for f in os.scandir(rootPath):
+                #print(type(f))
+                if f.is_dir():
+                    if includeDir:
+                        lst.append(f)
+                    OSHelp.genPathList(f.path,includeDir,extList,lst)
+                elif f.is_file():
+                    if pathlib.Path(f.path).suffix.upper() in extList or extList == ['*']:
+                        lst.append(f)
+        except Exception as e:
+            print("\"{}\" {}:{}".format(rootPath, type(e),str(e)))
+        return lst
 
     @classmethod
     def LocalizeFilesPath(cls):
@@ -65,6 +109,15 @@ class OSHelp(object):
         報告檔案路徑
         '''
         return path.join(OSHelp.outputPath(), "reports.txt")
+    
+    @staticmethod
+    def newConsole():
+        if sys.platform == "win32":
+            p1 = Popen('start', shell=True)
+        elif sys.platform == "linux":
+            p1 = Popen('gnome-terminal', shell=True)
+
+
 
 class DBHelp(object):
     @staticmethod
@@ -246,6 +299,7 @@ class RegExHelp(object):
 
     @classmethod
     def writeReport(cls):
+        global g_reportLogs
         g_reportLogs.sort(key = lambda s: s["filename"])
         try:
             f = open(OSHelp.reportFile(),'a+', encoding='utf-8')

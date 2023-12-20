@@ -4,7 +4,7 @@ pyinstaller 封裝執行檔
 pyinstaller --add-data="regexlist.db:." --add-data="LocalizeFiles:LocalizeFiles" -F --clean ESLocalize_cmd.py
 '''
 
-from RegExHelp import *
+from BeHelp import *
 from os import *
 from math import floor
 import re

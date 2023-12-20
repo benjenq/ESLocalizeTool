@@ -305,12 +305,6 @@ msgid "0 STARS"
 msgstr "0 顆星星"
 
 msgid "FILENAME, DESCENDING"
-msgstr "檔案名稱 降序"
-
-msgid "name, ascending"
-msgstr "遊戲名稱 升序"
-
-msgid "name, descending"
 msgstr "遊戲名稱 降序"
 
 msgid "RATING, ASCENDING"
@@ -664,9 +658,6 @@ msgstr "回前頁"
 
 msgid "OPTIONS"
 msgstr "選項"
-
-msgid "JUMP TO ..."
-msgstr "跳至..."
 
 msgid "options"
 msgstr "選項"
@@ -1186,9 +1177,6 @@ msgstr "OMX: 斜體字型路徑"
 
 msgid "GAME INFO ALIGNMENT"
 msgstr "對齊遊戲資訊"
-
-msgid "VIDEO RESOLUTION"
-msgstr "影片解析度"
 
 msgid "original"
 msgstr "原始"
