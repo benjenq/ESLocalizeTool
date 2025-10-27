@@ -213,6 +213,10 @@ class DialogError(QtWidgets.QDialog, UIDlgAlert.Ui_MsgBox):
         #evnt.ignore()
 
 if __name__ == "__main__":
+    import sys,os
+    os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    os.environ["QT_SCALE_FACTOR"]             = "1"
     app = QtWidgets.QApplication(sys.argv)
     mainWin = mainWin()
     mainWin.show()
