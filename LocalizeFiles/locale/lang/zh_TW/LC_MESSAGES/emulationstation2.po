@@ -232,6 +232,30 @@ msgstr "我的最愛"
 msgid "COLLECTIONS"
 msgstr "收藏匣"
 
+msgid "RANDOM COLLECTION"
+msgstr "隨機收藏"
+
+msgid "INCLUDE SYSTEMS"
+msgstr "包含系統"
+
+msgid "INCLUDE AUTO COLLECTIONS"
+msgstr "包含自動收藏"
+
+msgid "INCLUDE CUSTOM COLLECTIONS"
+msgstr "包含自訂收藏"
+
+msgid "EXCLUDE GAMES FROM"
+msgstr "排除以下來源的遊戲"
+
+msgid "MAX GAMES"
+msgstr "最大遊戲數量"
+
+msgid "INCLUDE GAMES FROM"
+msgstr "包含以下來源的遊戲"
+
+msgid "RANDOM GAME COLLECTION SETTINGS"
+msgstr "隨機遊戲收藏設定"
+
 msgid "New Collection"
 msgstr "新收藏匣"
 
