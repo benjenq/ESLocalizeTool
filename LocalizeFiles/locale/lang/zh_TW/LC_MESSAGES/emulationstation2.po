@@ -692,6 +692,9 @@ msgstr "選項"
 msgid "JUMP TO ..."
 msgstr "跳至..."
 
+msgid "LAUNCH SYSTEM SCREENSAVER"
+msgstr "啟動系統螢幕保護程式"
+
 msgid "options"
 msgstr "選項"
 
@@ -1048,6 +1051,9 @@ msgstr "收藏匣顯示系統名稱"
 msgid "PRESS (Y) TWICE TO REMOVE FROM FAVS./COLL."
 msgstr "重複 Y 鍵自最愛/收藏移除"
 
+msgid "ADD/REMOVE GAMES WHILE SCREENSAVER TO"
+msgstr "在螢幕保護期間新增/移除遊戲至"
+
 msgid "FINISH EDITING '{1}' COLLECTION"
 msgstr "'{1}' 完成編輯收藏匣"
 
@@ -1102,6 +1108,9 @@ msgstr "過濾遊戲列表"
 
 msgid "ADD/REMOVE GAMES TO THIS GAME COLLECTION"
 msgstr "將遊戲添加或删除到此遊戲集合"
+
+msgid "GET NEW RANDOM GAMES"
+msgstr "隨機挑選新遊戲"
 
 msgid "EDIT THIS GAME'S METADATA"
 msgstr "編輯此遊戲的資料"
